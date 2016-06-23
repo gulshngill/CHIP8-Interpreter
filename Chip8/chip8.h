@@ -3,6 +3,7 @@ class chip8 {
     chip8();  
     ~chip8();
     void initialize();
+    bool loadApplication(const char* filename);
 
     unsigned char  gfx[64 * 32];	//2048 pixels
 
@@ -13,9 +14,9 @@ class chip8 {
     unsigned short sp;        // Stack pointer
 
     
-    unsigned char  V[16];			// V-regs (V0-VF)
+    unsigned char  V[16];			// V-regs (V0-VF) (system contains 16 basic registers)
 	unsigned short stack[16];		// Stack (16 levels)
-	unsigned char  memory[4096];	// Memory (size = 4k)
+	unsigned char  memory[4096];	// Memory (size = 4kb)
 
 	//Timers (System has two timer registers that counts at 60Hz, will count down to 0)
 	unsigned char  delay_timer;		// Delay timer: used for timing the events of the game 

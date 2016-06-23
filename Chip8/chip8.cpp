@@ -1,4 +1,4 @@
-unsigned char chip8_fontset[80] =
+unsigned char fontset[80] =
 { 
     0xF0, 0x90, 0x90, 0x90, 0xF0, //0
     0x20, 0x60, 0x20, 0x20, 0x70, //1
@@ -44,9 +44,26 @@ void chip8::initialize()
    
   // Load fontset (fontset should be loaded in memory location 0x50 == 80 and onwards)
   for(int i = 0; i < 80; ++i)
-    memory[i] = chip8_fontset[i];		
+    memory[i] = fontset[i];		
    
   // Reset timers
   delay_timer = 0;
   sound_timer = 0;
+}
+
+bool chip8::loadApplication(const char * filename)
+{
+  //reset
+  initialize();
+    
+  // Open file
+  printf("Loading: %s\n", filename);
+  FILE * pFile = fopen(filename, "rb"); //open file as a binary file
+  if (pFile == NULL)
+  {
+    fputs ("File error", stderr); 
+    return false;
+  }
+
+  return true;
 }
