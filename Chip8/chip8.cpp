@@ -65,5 +65,11 @@ bool chip8::loadApplication(const char * filename)
     return false;
   }
 
+  //Get file size
+  fseek(pFile, 0, SEEK_END); //put position indicator to the end
+  long size = ftell(pFile); //returns current value of position indicator 
+  rewind(pFile); //return position indicator back to beginning
+  printf("Filesize: %d\n", (int)lSize); 
+
   return true;
 }
