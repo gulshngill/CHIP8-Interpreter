@@ -71,5 +71,31 @@ bool chip8::loadApplication(const char * filename)
   rewind(pFile); //return position indicator back to beginning
   printf("Filesize: %d\n", (int)lSize); 
 
+  //Allocate memory to store file
+  char * fileMem = (char*)malloc(sizeof(char) * lSize); //it is stored in binary and each digit is a char
+  if(fileMem == NULL) {
+    fputs ("Memory error", stderr);
+    return false;
+  } 
+
+  //store file in fileMem
+  size_t result = fread(fileMem, 1, lSize, pFile);
+  if(return != lSize) {
+    fputs("Error", stderr);
+    return false;
+  }
+
+  //copy to chip8 memory
+  if((4096-512) > lSize) {
+    for (int i = 0; i < lSize; ++i) {
+      memory[i+512] = fileMem[i];
+    }
+  } else {
+    fputs("File too large", stderr);
+  }
+
+  fclose(pFile);
+  free(fileMem);
+
   return true;
 }
