@@ -121,7 +121,8 @@ void chip8::Emulate() {
           break;
       }
       break;
-    case 0x1000:
+    case 0x1000: //Jumps to address NNN.
+      pc = opcode & 0x0FFF;
       break;
     case 0x2000:
       break;
