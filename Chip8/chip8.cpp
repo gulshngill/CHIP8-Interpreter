@@ -124,7 +124,10 @@ void chip8::Emulate() {
     case 0x1000: //Jumps to address NNN.
       pc = opcode & 0x0FFF;
       break;
-    case 0x2000:
+    case 0x2000: //Calls subroutine at NNN
+      stack[sp] = pc; //store current address in stack
+      ++sp; //increment stack pointer by 1
+      pc = opcode & 0x0FFF;
       break;
     case 0x3000:
       break;
