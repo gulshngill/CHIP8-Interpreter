@@ -107,7 +107,19 @@ void chip8::Emulate() {
   //decode opcode
   //execute opcode
   switch(opcode & 0xF000) { //opcode & 0xF000 to get first digit of opcode
-    case 0x0000:
+    case 0x0000: 
+      switch(opcode & 0x00FF) { //get last two digits
+        //00E0 & 00EE
+        case 0x00E0: //clears the screen
+          for(int i = 0; i < 2048; ++i)
+            gfx[i] = 0;
+          break;
+        case 0x00EE: //Returns from a subroutine
+          --sp;    
+          pc = stack[sp]; // Put previous address from the stack back into the program counter         
+          pc += 2;    //Increase by 2 becasue each instruction is 2 bytes long
+          break;
+      }
       break;
     case 0x1000:
       break;
