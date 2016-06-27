@@ -79,13 +79,13 @@ bool chip8::loadApplication(const char * filename)
   } 
 
   //store file in fileMem
-  size_t result = fread(fileMem, 1, lSize, pFile);
+  size_t result = fread(fileMem, 1, lSize, pFile); //(target, size(byte)/element, no. of ele, inputstream)
   if(return != lSize) {
     fputs("Error", stderr);
     return false;
   }
 
-  //copy to chip8 memory
+  //copy to chip8 memory 
   if((4096-512) > lSize) {
     for (int i = 0; i < lSize; ++i) {
       memory[i+512] = fileMem[i];
@@ -98,4 +98,46 @@ bool chip8::loadApplication(const char * filename)
   free(fileMem);
 
   return true;
+}
+
+void chip8::Emulate() {
+  //fetch opcode
+  opcode = memory[pc] << 8 | memory[pc+1]; //merge the two adjacent addresses to get opcode
+
+  //decode opcode
+  //execute opcode
+  switch(opcode & 0xF000) { //opcode & 0xF000 to get first digit of opcode
+    case 0x0000:
+      break;
+    case 0x1000:
+      break;
+    case 0x2000:
+      break;
+    case 0x3000:
+      break;
+    case 0x4000:
+      break;
+    case 0x5000:
+      break;
+    case 0x6000:
+      break;
+    case 0x7000:
+      break;
+    case 0x8000:
+      break;
+    case 0x9000:
+      break;
+    case 0xA000:
+      break;
+    case 0xB000:
+      break;
+    case 0xC000:
+      break;
+    case 0xD000:
+      break;
+    case 0xE000:
+      break;
+    case 0xF000:
+      break;
+  }
 }

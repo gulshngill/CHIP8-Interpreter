@@ -4,6 +4,7 @@ class chip8 {
     ~chip8();
     void initialize();
     bool loadApplication(const char* filename);
+    void Emulate(); //emulates one cycle of the Chip 8 CPU
 
     unsigned char  gfx[64 * 32];	//2048 pixels
 
