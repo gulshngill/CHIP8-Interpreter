@@ -13,6 +13,7 @@ class chip8 {
     unsigned short opcode;      // Current opcode
     unsigned short I;       // Index register
     unsigned short sp;        // Stack pointer; to remember which level of the stack is used
+    unsigned short result;
 
     
     unsigned char  V[16];			// V-regs (V0-VF) (system contains 15 8-bit general purpose registers, 16th register is carry flag)

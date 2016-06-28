@@ -174,10 +174,47 @@ void chip8::Emulate() {
           V[(opcode & 0x0F00) >> 8] ^= V[(opcode & 0x00F0) >> 4];
           pc += 2;
           break;
-        case 0x0004: //8XY4 - Adds VY to VX. VF is set to 1 when there's a carry, and to 0 when there isn't
-          V[(opcode & 0x0F00) >> 8] |= V[(opcode & 0x00F0) >> 4];
+        case 0x0004: //8XY4 - Adds VY to VX. VF is set to 1 when there's a carry, and to 0 when there isn't (VF = carry flag)
+          V[(opcode & 0x0F00) >> 8] += V[(opcode & 0x00F0) >> 4]; //add VY to VX
+
+          if(V[(opcode & 0x0F00) >> 8] > 0xFF) //if its larger than 2bits
+            V[0xF] = 1; //carry
+          else 
+            V[0xF] = 0; 
+
           pc += 2;
           break; 
+        case 0x0005: //8XY5 - VY is subtracted from VX. VF is set to 0 when there's a borrow, and 1 when there isn't.
+          if(V[(opcode & 0x00F0) >> 4] > V[(opcode & 0x0F00) >> 8]) //borrow happens whem VY > VX
+            V[0xF] = 0;
+          else 
+            V[0xF] = 1;
+
+          V[(opcode & 0x0F00) >> 8] -= V[(opcode & 0x00F0) >> 4];
+
+          pc += 2;
+          break;
+        case 0x0006: //8XY6 Shifts VX right by one. VF is set to the value of the least significant bit of VX before the shift
+          V[0xF] = V[(opcode & 0x0F00) >> 8] & 0x1; //get least significant bit (before shifting)
+          V[(opcode & 0x0F00) >> 8] >>= 1; //shift right by 1
+
+          pc +=2;
+          break;
+        case 0x0007: //8XY7 - Sets VX to VY minus VX. VF is set to 0 when there's a borrow, and 1 when there isn't.
+          if(V[(opcode & 0x0F00) >> 8] > V[(opcode & 0x00F0) >> 4]) //if VX > VY
+            V[0xF] = 0; // there is a borrow
+          else
+            V[0xF] = 1;
+          V[(opcode & 0x0F00) >> 8] = V[(opcode & 0x00F0) >> 4] - V[(opcode & 0x0F00) >> 8];
+          pc += 2;
+          break;
+        case 0x000E: //8XYE - Shifts VX left by one. VF is set to the value of the most significant bit of VX before the shift
+          V[0xF] = V[(opcode & 0x0F00) >> 8] & 0x1000;
+          V[(opcode & 0x0F00) >> 8] <<= 1; 
+          break;
+
+        default:
+          printf ("Unknown opcode [0x8000]: 0x%X\n", opcode);
       }
       break;
     case 0x9000:
