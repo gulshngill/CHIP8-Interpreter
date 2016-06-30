@@ -253,8 +253,8 @@ void chip8::Emulate() {
           pixel = memory[I + y-axis]; //Fetch the pixel value from the memory starting at location I (one memory address represents one row; 1 row is 8 bits) 
           for(int x-axis = 0; x-axis < 8; x-axis++) { //go trough each bit
             if((pixel & (0x80 >> x-axis)) >> 8 != 0) { //if pixel in memory is 1 
-              unsigned short totalX = x + xline;
-              unsigned short totalY = y + yline;
+              unsigned short totalX = x + x-axis;
+              unsigned short totalY = y + y-axis;
               unsigned short index = totalX + (totalY * 64)
 
               if(gfx[index] == 1) { //if on screen and memory == 1
