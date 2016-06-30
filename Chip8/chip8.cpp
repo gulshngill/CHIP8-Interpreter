@@ -24,7 +24,7 @@ void chip8::initialize()
   pc     = 0x200;  // Program counter starts at 0x200 because system expects application to be loaded at this memory location
   opcode = 0;      // Reset current opcode	
   I      = 0;      // Reset index register
-  sp     = 0;      // Reset stack pointer
+  sp     = 0;      // Reset stack pointer 
    
   // Clear display (0 = black; 1 = whitle)
   for(int i = 0; i < 2048; ++i)
@@ -211,25 +211,97 @@ void chip8::Emulate() {
         case 0x000E: //8XYE - Shifts VX left by one. VF is set to the value of the most significant bit of VX before the shift
           V[0xF] = V[(opcode & 0x0F00) >> 8] & 0x1000;
           V[(opcode & 0x0F00) >> 8] <<= 1; 
+          pc+=2;
           break;
 
         default:
           printf ("Unknown opcode [0x8000]: 0x%X\n", opcode);
       }
       break;
-    case 0x9000:
+    case 0x9000: //9XY0 - Skips the next instruction if VX doesn't equal VY
+      if(V[(opcode & 0x0F00) >> 8] != V[(opcode & 0x00F0) >> 4])
+        pc += 4;
+      else
+        pc += 2;
       break;
-    case 0xA000:
+    case 0xA000: //ANNN - Sets I to the address NNN
+      I = opcode & 0x0FFF;
+      pc += 2;
       break;
-    case 0xB000:
+    case 0xB000: //BNNN - Jumps to the address NNN plus V0
+      pc = (opcode & 0x0FFF) + V[0];
       break;
-    case 0xC000:
+    case 0xC000: // CXNN - Sets VX to the result of a bitwise and operation on a random number and NN
+      srand (time(NULL));
+      V[(opcode & 0x0F00) >> 8] = (rand % 0xFF) & (opcode & 0x00FF)
+      pc += 2;
       break;
-    case 0xD000:
+    case 0xD000: //DXYN - responsible for drawing to display
+      //The interpreter reads 'n' bytes from memory, starting at the address stored in I. 
+      //These bytes are then displayed as sprites on screen at coordinates (Vx, Vy). Sprites are XORed onto the existing screen. 
+      //If this causes any pixels to be erased, VF is set to 1, otherwise it is set to 0. 
+      //If the sprite is positioned so part of it is outside the coordinates of the display, it wraps around to the opposite side of the screen. 
+      // If the current value is different from the value in the memory, the bit value will be 1. If both values match, the bit value will be 0
+      {
+        unsigned short x = V[(opcode & 0x0F00) >> 8]; //VX
+        unsigned short y = V[(opcode & 0x00F0) >> 4]; //VY
+        unsigned short height = opcode & 0x000F; //N
+        unsigned short pixel;
+
+        V[0xF] = 0; //reset VF back to 0
+        for(int y-axis = 0; y < height; y++) { //navigate row by row
+          pixel = memory[I + y-axis]; //Fetch the pixel value from the memory starting at location I (one memory address represents one row; 1 row is 8 bits) 
+          for(int x-axis = 0; x-axis < 8; x-axis++) { //go trough each bit
+            if((pixel & (0x80 >> x-axis)) >> 8 != 0) { //if pixel in memory is 1 
+              unsigned short totalX = x + xline;
+              unsigned short totalY = y + yline;
+              unsigned short index = totalX + (totalY * 64)
+
+              if(gfx[index] == 1) { //if on screen and memory == 1
+                V[0xF] = 1; //Set VF to 1 (turn on collision detection)                                   
+              } 
+              gfx[index] ^= 1; //XORed onto the existing screen
+            }
+            else 
+
+          }
+        }
+        pc += 2;
+      }
       break;
-    case 0xE000:
+    case 0xE000: 
+      switch(opcode & 0x00FF) {
+        case 0x009E: // EX9E - Skips the next instruction if the key stored in VX is pressed
+          pc +=2;
+          break;
+        case 0x00A1: //EXA1 - Skips the next instruction if the key stored in VX isn't pressed
+          pc += 2;
+          break;
+        default:
+          printf ("Unknown opcode [0xE000]: 0x%X\n", opcode);
+      }
       break;
     case 0xF000:
+      switch(opcode & 0x00FF) {
+        case 0x0007:
+          break;
+        case 0x0015:
+          break;
+        case 0x0018:
+          break;
+        case 0x001E:
+          break;
+        case 0x0029:
+          break;
+        case 0x0033:
+          break;
+        case 0x0055:
+          break;
+        case 0x0065:
+          break;
+        default:
+          printf ("Unknown opcode [0xF000]: 0x%X\n", opcode);
+      }
       break;
-  }
+  } 
 }
